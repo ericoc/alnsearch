@@ -24,10 +24,10 @@ which are separated by a period (`.`), such as the following:
 ### Help
 ```py
 $ python3 __init__.py -h
-usage: HTTPS JSON REST API search client for Assistance Listing Numbers (ALNs) [-h] cfda
+usage: HTTPS JSON REST API search client for Assistance Listing Numbers (ALNs). [-h] aln
 
 positional arguments:
-cfda        ALN, formerly CFDA, to search.
+aln         ALN (aka. CFDA #)
 
 options:
 -h, --help  show this help message and exit
@@ -35,40 +35,61 @@ options:
 
 ### Multiple Agencies
 #### 81.049
+
+##### Python
 ```py
 $ python3 __init__.py 81.049
-2025-05-03 22:24:00 EDT (-0400) [INFO] (30788): 2 agencies found for ALN/CFDA "81.049".
-2025-05-03 22:24:00 EDT (-0400) [INFO] (30788):         1. Department of Energy - Office of Science
-2025-05-03 22:24:00 EDT (-0400) [INFO] (30788):         2. U.S. National Science Foundation
+2025-05-03 23:23:41 EDT (-0400) [INFO] (34141): 2 agencies found. (81.049)
+2025-05-03 23:23:41 EDT (-0400) [INFO] (34141):         1) Department of Energy - Office of Science
+2025-05-03 23:23:41 EDT (-0400) [INFO] (34141):         2) U.S. National Science Foundation
 ```
 
-### One Agency
-#### 47.049
-```py
-$ python3 __init__.py 47.049
-2025-05-03 22:24:09 EDT (-0400) [INFO] (30804): 1 agencies found for ALN/CFDA "47.049".
-2025-05-03 22:24:09 EDT (-0400) [INFO] (30804):         1. U.S. National Science Foundation
-```
-
-### Failure
-#### 41.049
-```py
-$ python3 __init__.py 41.049
-Traceback (most recent call last):
-File "/Users/eric/code/cfda/__init__.py", line 52, in <module>
-assert agency_count > 0, f'No agencies found for ALN/CFDA: "{args.cfda}".'
-^^^^^^^^^^^^^^^^
-AssertionError: No agencies found for ALN/CFDA: "41.049".
-```
-
-### cURL
-
-```shell
-$ curl -s 'https://api.grants.gov/v1/api/search2' -H 'Content-Type: application/json' -d '{"cfda": "47.049"}' | jq '.data.agencies.[].label'
-"U.S. National Science Foundation"
-```
+##### cURL
 ```shell
 $ curl -s 'https://api.grants.gov/v1/api/search2' -H 'Content-Type: application/json' -d '{"cfda": "81.049"}' | jq '.data.agencies.[].label'
 "Department of Energy - Office of Science"
 "U.S. National Science Foundation"
+```
+
+
+### One Agency
+#### 47.049
+
+##### Python
+```py
+$ python3 __init__.py 47.049
+2025-05-03 23:23:57 EDT (-0400) [INFO] (34181): 1 agencies found. (47.049)
+2025-05-03 23:23:57 EDT (-0400) [INFO] (34181):         1) U.S. National Science Foundation
+```
+
+##### cURL
+```shell
+$ curl -s 'https://api.grants.gov/v1/api/search2' -H 'Content-Type: application/json' -d '{"cfda": "47.049"}' | jq '.data.agencies.[].label'
+"U.S. National Science Foundation"
+```
+
+---
+
+### Failures
+
+#### 41.049
+##### No Agencies
+```py
+$ python3 __init__.py 41.049
+Traceback (most recent call last):
+File "/Users/eric/code/alnsearch/__init__.py", line 49, in <module>
+assert agency_count > 0, (
+    ^^^^^^^^^^^^^^^^
+    AssertionError: No agencies found for Assistance Listing Number! (41.049)
+```
+
+#### 41.0499
+##### Invalid ALN Format
+```py
+$ python3 __init__.py 41.0499
+Traceback (most recent call last):
+File "/Users/eric/code/alnsearch/__init__.py", line 25, in <module>
+assert fullmatch(pattern=r"^[0-9]{2}\.[0-9]{3}$", string=args.aln), (
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Invalid Assistance Listing Number (ALN, aka. CFDA #) format! (41.0499)
 ```
