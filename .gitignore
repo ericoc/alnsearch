@@ -1,0 +1,16 @@
+*~
+.*
+!.gitignore
+__pycache__
+*.djcache
+*.log
+*.pyc
+settings.py
+gunicorn_configuration.py
+test.py
+venv
+/cache/
+/media/
+/static/
+/lib/
+/logs/
